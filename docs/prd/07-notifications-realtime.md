@@ -39,7 +39,7 @@ No PII in NOTIFY payload (ids only).
 | FR-RT-007 | Digest body: top 5 new published experiences, 5 trending place ids, optional rec ids | 6 | Schema `_v: 1` |
 | FR-RT-008 | `GET /v1/digests/latest` returns newest digest for caller or 404 | 6 | |
 | FR-RT-009 | Skip digest if `preferences.doc.notifyDigest === false` | 6 | |
-| FR-RT-010 | AFTER INSERT trigger NOTIFY `nexus_activity` with JSON ids | 7 | Payload < 8000 bytes |
+| FR-RT-010 | AFTER INSERT trigger NOTIFY `tusk_activity` with JSON ids | 7 | Payload < 8000 bytes |
 | FR-RT-011 | Feed is correct even if NOTIFY is dropped (pull is SoT) | 7 | |
 
 ## 6. User stories
@@ -50,7 +50,7 @@ No PII in NOTIFY payload (ids only).
 
 ## 7. Realtime implementation note (product-visible)
 
-v1 does **not** require a browser EventSource. A README snippet showing `LISTEN nexus_activity` in `psql` is enough. Optional Fastify LISTEN plugin is a demo, not a mobile-scale fan-out.
+v1 does **not** require a browser EventSource. A README snippet showing `LISTEN tusk_activity` in `psql` is enough. Optional Fastify LISTEN plugin is a demo, not a mobile-scale fan-out.
 
 ## 8. Dependencies
 

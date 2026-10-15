@@ -1,9 +1,9 @@
 ---
-name: nexus-api
-description: Implements Nexus Fastify REST /v1 routes, envelopes, errors, auth, and pagination. Use when adding endpoints, handlers, HTTP schemas, or changing API contracts.
+name: tusk-api
+description: Implements Tusk Fastify REST /v1 routes, envelopes, errors, auth, and pagination. Use when adding endpoints, handlers, HTTP schemas, or changing API contracts.
 ---
 
-# Nexus API
+# Tusk API
 
 ## Route module
 

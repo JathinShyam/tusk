@@ -1,9 +1,9 @@
 ---
-name: nexus-hybrid-search
-description: Implements Nexus hybrid search and recommendations (tsvector, pgvector HNSW, PostGIS distance, ranking weights). Use when writing GET /v1/search, embeddings, FTS, HNSW, or recs SQL.
+name: tusk-hybrid-search
+description: Implements Tusk hybrid search and recommendations (tsvector, pgvector HNSW, PostGIS distance, ranking weights). Use when writing GET /v1/search, embeddings, FTS, HNSW, or recs SQL.
 ---
 
-# Nexus hybrid search
+# Tusk hybrid search
 
 ## Instructions
 

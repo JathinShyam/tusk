@@ -1,5 +1,5 @@
 ---
-description: TypeScript and Fastify module conventions for the Nexus API.
+description: TypeScript and Fastify module conventions for the Tusk API.
 globs: apps/api/**/*.{ts,mts}
 alwaysApply: false
 ---

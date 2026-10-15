@@ -1,4 +1,4 @@
-# Nexus — Product Requirements Document (Master)
+# Tusk — Product Requirements Document (Master)
 
 **Version:** 1.0  
 **Status:** Approved for Phase 0–4 implementation; Phases 5–8 specified, not committed to a date  
@@ -9,13 +9,13 @@
 
 ## 1. Vision
 
-Nexus is a **multi-tenant Local Experiences & Intelligence Hub**: Airbnb Experiences-like booking, map-grade “near me”, and personalized recommendations — operated as SaaS for cities, brands, and enterprise clients.
+Tusk is a **multi-tenant Local Experiences & Intelligence Hub**: Airbnb Experiences-like booking, map-grade “near me”, and personalized recommendations — operated as SaaS for cities, brands, and enterprise clients.
 
 Each tenant is a fully isolated product surface (data, users, content, rankings). The platform owner runs many tenants on one Postgres-backed API.
 
 ## 2. Problem
 
-Local discovery products usually split the problem across four systems (primary DB, search engine, vector DB, cache). That fragments consistency, tenancy, and operations. Nexus proves a single Postgres instance can be the system of record **and** the query engine for geo, keyword, semantic, document, cache, and job workloads — without becoming a toy CRUD app.
+Local discovery products usually split the problem across four systems (primary DB, search engine, vector DB, cache). That fragments consistency, tenancy, and operations. Tusk proves a single Postgres instance can be the system of record **and** the query engine for geo, keyword, semantic, document, cache, and job workloads — without becoming a toy CRUD app.
 
 ## 3. Goals
 
@@ -45,7 +45,7 @@ Local discovery products usually split the problem across four systems (primary 
 | **Explorer** | Guest user | Discover nearby places/experiences, search, book, review, follow a digest |
 | **Host** | Lists experiences | Publish experience, set capacity/schedule, see bookings |
 | **Tenant admin** | City / brand / enterprise | Manage users, boundaries, feature flags, ranking weights |
-| **Platform admin** | Nexus operator | Provision tenants, inspect health, run privileged maintenance (BYPASSRLS role only in ops) |
+| **Platform admin** | Tusk operator | Provision tenants, inspect health, run privileged maintenance (BYPASSRLS role only in ops) |
 
 ## 6. Tenant model
 

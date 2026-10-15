@@ -1,15 +1,15 @@
 ---
-name: nexus-schema
-description: Designs and migrates Nexus PostgreSQL schema (PostGIS, pgvector, tsvector, JSONB, UNLOGGED, partitions, constraints). Use when creating tables, indexes, extensions, generated columns, or SQL migrations.
+name: tusk-schema
+description: Designs and migrates Tusk PostgreSQL schema (PostGIS, pgvector, tsvector, JSONB, UNLOGGED, partitions, constraints). Use when creating tables, indexes, extensions, generated columns, or SQL migrations.
 ---
 
-# Nexus schema
+# Tusk schema
 
 ## Instructions
 
 1. Read [TRD §7](../../../docs/TRD.md) and the feature PRD for the entity.
 2. Follow [reference.md](reference.md) for column/index/RLS templates.
-3. One migration per coherent change. Same migration as: table + indexes + RLS + grants to `nexus_app`.
+3. One migration per coherent change. Same migration as: table + indexes + RLS + grants to `tusk_app`.
 4. Do not add Redis/ES tables. Do not use Prisma.
 
 ## Required on every tenant table

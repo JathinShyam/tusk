@@ -1,9 +1,9 @@
 ---
-name: nexus-sql
-description: Writes Nexus application SQL (transactions, locks, JSONB, CTEs, EXPLAIN). Use when adding queries, bookings concurrency, JSONB filters, or performance work.
+name: tusk-sql
+description: Writes Tusk application SQL (transactions, locks, JSONB, CTEs, EXPLAIN). Use when adding queries, bookings concurrency, JSONB filters, or performance work.
 ---
 
-# Nexus application SQL
+# Tusk application SQL
 
 ## Client
 

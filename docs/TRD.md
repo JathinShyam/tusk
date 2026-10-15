@@ -1,4 +1,4 @@
-# Nexus — Technical Requirements Document
+# Tusk — Technical Requirements Document
 
 **Version:** 1.0  
 **Status:** Binding for implementation  
@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-Specify architecture, data, API, security, performance, and operations for the Nexus API so implementation does not reinvent stack or isolation.
+Specify architecture, data, API, security, performance, and operations for the Tusk API so implementation does not reinvent stack or isolation.
 
 ## 2. System context
 
@@ -69,9 +69,9 @@ Specify architecture, data, API, security, performance, and operations for the N
 
 | Role | Use |
 |------|-----|
-| `nexus_migrator` | DDL, `BYPASSRLS`, owned by compose init |
-| `nexus_app` | DML via API; **no** BYPASSRLS; `SET ROLE` not required if DSN is this user |
-| `nexus_cron` | Functions invoked by pg_cron; SECURITY DEFINER only where documented |
+| `tusk_migrator` | DDL, `BYPASSRLS`, owned by compose init |
+| `tusk_app` | DML via API; **no** BYPASSRLS; `SET ROLE` not required if DSN is this user |
+| `tusk_cron` | Functions invoked by pg_cron; SECURITY DEFINER only where documented |
 
 App role: `GRANT` table DML as needed; **no** `BYPASSRLS`. Default privileges documented in the identity migration.
 
@@ -291,7 +291,7 @@ Admin platform routes (platform admin JWT): `POST /v1/platform/tenants` — Phas
 | Generate digest rows | 6 | daily per tenant timezone in settings |
 | Vacuum / analyze hints | 8 | document autovacuum; don’t cron vacuum blindly |
 
-Cron functions must be tenant-safe (loop tenants or include `tenant_id` in SQL). They run as `nexus_cron` with documented DEFINER.
+Cron functions must be tenant-safe (loop tenants or include `tenant_id` in SQL). They run as `tusk_cron` with documented DEFINER.
 
 ## 14. Observability
 

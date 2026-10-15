@@ -1,4 +1,4 @@
-# Nexus — Phase-wise Roadmap
+# Tusk — Phase-wise Roadmap
 
 **Rule:** implement the lowest incomplete phase until its **exit criteria** pass. Do not start the next phase’s features early except shared bugfixes.
 
@@ -28,7 +28,7 @@
 **Compose**
 - [x] `[T]` `deploy/docker-compose.yml`: Postgres 16+ with PostGIS
 - [x] `[T]` Init: `CREATE EXTENSION` for `postgis`, `vector`, `pg_trgm`, `pg_stat_statements`, `pgcrypto` (or equivalent); `pg_cron` if image allows (document if not)
-- [x] `[T]` Init: roles `nexus_migrator`, `nexus_app` (passwords via env)
+- [x] `[T]` Init: roles `tusk_migrator`, `tusk_app` (passwords via env)
 - [x] `[T]` Named volume for PG data
 - [x] `[T]` API service optional in Compose **or** run API on host against published 5432 — pick one, document in README
 
@@ -72,36 +72,36 @@ Auth, tables, RLS, search.
 ### Checklist
 
 **Schema**
-- [ ] `[T]` `tenants`, `users`, `memberships`, `refresh_tokens`
-- [ ] `[T]` UUIDv7 (or documented generator) for PKs
-- [ ] `[T]` `updated_at` trigger function reused later
-- [ ] `[T]` Indexes: `users(email)`, `memberships(tenant_id, user_id)` unique
-- [ ] `[T]` `FORCE ROW LEVEL SECURITY` + policies on tenant-scoped tables
-- [ ] `[T]` `tenants` visibility: members can select own tenant; platform admin via membership role `platform_admin` **or** separate flag on user — implement as specified in identity PRD
-- [ ] `[T]` App role has no `BYPASSRLS`
+- [x] `[T]` `tenants`, `users`, `memberships`, `refresh_tokens`
+- [x] `[T]` UUIDv7 (or documented generator) for PKs
+- [x] `[T]` `updated_at` trigger function reused later
+- [x] `[T]` Indexes: `users(email)`, `memberships(tenant_id, user_id)` unique
+- [x] `[T]` `FORCE ROW LEVEL SECURITY` + policies on tenant-scoped tables
+- [x] `[T]` `tenants` visibility: members can select own tenant; platform admin via membership role `platform_admin` **or** separate flag on user — implement as specified in identity PRD
+- [x] `[T]` App role has no `BYPASSRLS`
 
 **API**
-- [ ] `[P]` `POST /v1/auth/register` (creates user + first tenant **or** join via invite — follow FR-ID-004 default: register creates user, tenant created via platform or bootstrap)
-- [ ] `[P]` Bootstrap path: first register may create a tenant (dev) — gated by `ALLOW_SELF_TENANT=true` for local
-- [ ] `[P]` `POST /v1/auth/login`, `refresh`, `logout`
-- [ ] `[P]` `GET /v1/me`
-- [ ] `[P]` `POST /v1/platform/tenants` (platform admin)
-- [ ] `[P]` `GET/PATCH /v1/admin/tenant` (tenant admin)
+- [x] `[P]` `POST /v1/auth/register` (creates user + first tenant **or** join via invite — follow FR-ID-004 default: register creates user, tenant created via platform or bootstrap)
+- [x] `[P]` Bootstrap path: first register may create a tenant (dev) — gated by `ALLOW_SELF_TENANT=true` for local
+- [x] `[P]` `POST /v1/auth/login`, `refresh`, `logout`
+- [x] `[P]` `GET /v1/me`
+- [x] `[P]` `POST /v1/platform/tenants` (platform admin)
+- [x] `[P]` `GET/PATCH /v1/admin/tenant` (tenant admin)
 
 **App**
-- [ ] `[T]` Argon2id password hash
-- [ ] `[T]` Access JWT includes `sub`, `tid` (tenant), `role`
-- [ ] `[T]` Transaction wrapper: `set_config` for `app.tenant_id`, `app.user_id`, `app.role`
-- [ ] `[T]` Refresh rotation + hashed storage
-- [ ] `[T]` Mutating routes re-check membership in-tx (TR §6)
+- [x] `[T]` Argon2id password hash
+- [x] `[T]` Access JWT includes `sub`, `tid` (tenant), `role`
+- [x] `[T]` Transaction wrapper: `set_config` for `app.tenant_id`, `app.user_id`, `app.role`
+- [x] `[T]` Refresh rotation + hashed storage
+- [x] `[T]` Mutating routes re-check membership in-tx (TR §6)
 
 **Tests**
-- [ ] `[T]` TR-TEST-002 auth flow
-- [ ] `[T]` Two tenants, user B cannot read tenant A rows (use a dummy tenant-scoped table `rls_probe` if no places yet **or** seed tenants only and test `memberships` isolation)
-- [ ] `[T]` Missing `SET LOCAL` (query as app role without settings) returns zero rows
+- [x] `[T]` TR-TEST-002 auth flow
+- [x] `[T]` Two tenants, user B cannot read tenant A rows (use a dummy tenant-scoped table `rls_probe` if no places yet **or** seed tenants only and test `memberships` isolation)
+- [x] `[T]` Missing `SET LOCAL` (query as app role without settings) returns zero rows
 
 **Docs**
-- [ ] `[D]` README: how to create first platform admin
+- [x] `[D]` README: how to create first platform admin
 
 ### Exit criteria
 
@@ -345,7 +345,7 @@ Push email, WebSockets.
 ### Checklist
 
 **Realtime**
-- [ ] `[T]` Trigger `NOTIFY nexus_activity, payload` on `activity_events` insert (payload small: ids only)
+- [ ] `[T]` Trigger `NOTIFY tusk_activity, payload` on `activity_events` insert (payload small: ids only)
 - [ ] `[P]` `GET /v1/feed` cursor list (DB pull is source of truth; NOTIFY is hint)
 - [ ] `[T]` Optional: one Fastify plugin that LISTENs for local demo — document connection stickiness (not compatible with transaction pooling)
 
@@ -367,7 +367,7 @@ Push email, WebSockets.
 
 **Pooling**
 - [ ] `[T]` PgBouncer in Compose, transaction mode, app DSN through it
-- [ ] `[T]` Verify SET LOCAL still works (must)
+- [ ] `[T]` Verify SET LOCAL still works (must); set postgres.js `prepare: false` in `db/client.ts` (transaction pooling cannot reuse prepared statements)
 
 **Tests**
 - [ ] `[T]` Feed lists activity in order

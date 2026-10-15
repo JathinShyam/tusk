@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Operating manual for any coding agent working in Nexus. Product and technical truth live in `docs/`. This file is the **process** contract.
+Operating manual for any coding agent working in Tusk. Product and technical truth live in `docs/`. This file is the **process** contract.
 
 ## Read first
 
@@ -29,7 +29,7 @@ Build a Postgres-only Fastify REST API. Every major capability (geo, FTS, vector
 
 ## Phase execution
 
-Use the **nexus-phase** skill. Work loop:
+Use the **tusk-phase** skill. Work loop:
 
 1. Identify the lowest incomplete phase in `docs/ROADMAP.md`.
 2. Implement only checklist items in that phase (plus bugfixes in already-shipped phases).

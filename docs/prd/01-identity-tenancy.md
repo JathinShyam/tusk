@@ -6,7 +6,7 @@
 
 ## 1. Problem
 
-Nexus is multi-tenant SaaS. Without a real membership model and RLS, every later feature leaks data.
+Tusk is multi-tenant SaaS. Without a real membership model and RLS, every later feature leaks data.
 
 ## 2. In scope
 

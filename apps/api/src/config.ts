@@ -33,14 +33,27 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     throw new Error("Missing required environment variable: DATABASE_URL");
   }
 
+  const nodeEnv = env.NODE_ENV ?? "development";
+  const jwtAccessSecret = env.JWT_ACCESS_SECRET ?? "dev-access-secret-change-me";
+  const jwtRefreshSecret = env.JWT_REFRESH_SECRET ?? "dev-refresh-secret-change-me";
+  if (
+    nodeEnv === "production" &&
+    (jwtAccessSecret === "dev-access-secret-change-me" ||
+      jwtRefreshSecret === "dev-refresh-secret-change-me")
+  ) {
+    throw new Error(
+      "JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be set in production",
+    );
+  }
+
   return {
-    nodeEnv: env.NODE_ENV ?? "development",
+    nodeEnv,
     port: Number(env.PORT ?? "3000"),
     logLevel: env.LOG_LEVEL ?? "info",
     databaseUrl,
     databaseMigrateUrl: env.DATABASE_MIGRATE_URL ?? "",
-    jwtAccessSecret: env.JWT_ACCESS_SECRET ?? "dev-access-secret-change-me",
-    jwtRefreshSecret: env.JWT_REFRESH_SECRET ?? "dev-refresh-secret-change-me",
+    jwtAccessSecret,
+    jwtRefreshSecret,
     embeddingProvider: parseEmbeddingProvider(env.EMBEDDING_PROVIDER),
     embeddingApiKey: env.EMBEDDING_API_KEY ?? "",
     embeddingDim: Number(env.EMBEDDING_DIM ?? "1536"),
@@ -49,24 +62,5 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean),
-  };
-}
-
-/** For tests that only hit /v1/health (no real DB required). */
-export function loadConfigLoose(env: NodeJS.ProcessEnv = process.env): AppConfig {
-  return {
-    nodeEnv: env.NODE_ENV ?? "test",
-    port: Number(env.PORT ?? "0"),
-    logLevel: env.LOG_LEVEL ?? "error",
-    databaseUrl:
-      env.DATABASE_URL ?? "postgres://invalid:invalid@127.0.0.1:1/invalid",
-    databaseMigrateUrl: env.DATABASE_MIGRATE_URL ?? "",
-    jwtAccessSecret: env.JWT_ACCESS_SECRET ?? "test-access",
-    jwtRefreshSecret: env.JWT_REFRESH_SECRET ?? "test-refresh",
-    embeddingProvider: parseEmbeddingProvider(env.EMBEDDING_PROVIDER ?? "mock"),
-    embeddingApiKey: env.EMBEDDING_API_KEY ?? "",
-    embeddingDim: Number(env.EMBEDDING_DIM ?? "1536"),
-    allowSelfTenant: bool("ALLOW_SELF_TENANT", env, true),
-    corsOrigins: ["http://localhost:3000"],
   };
 }
