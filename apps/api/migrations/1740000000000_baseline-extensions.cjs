@@ -44,21 +44,21 @@ END $$;
   pgm.sql(`
 DO $$
 BEGIN
-  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'nexus_migrator')
-     AND EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'nexus_app') THEN
-    EXECUTE format('GRANT CONNECT ON DATABASE %I TO nexus_migrator', current_database());
-    EXECUTE format('GRANT CONNECT ON DATABASE %I TO nexus_app', current_database());
-    GRANT USAGE, CREATE ON SCHEMA public TO nexus_migrator;
-    GRANT USAGE ON SCHEMA public TO nexus_app;
-    ALTER DEFAULT PRIVILEGES FOR ROLE nexus_migrator IN SCHEMA public
-      GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nexus_app;
-    ALTER DEFAULT PRIVILEGES FOR ROLE nexus_migrator IN SCHEMA public
-      GRANT USAGE, SELECT ON SEQUENCES TO nexus_app;
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tusk_migrator')
+     AND EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tusk_app') THEN
+    EXECUTE format('GRANT CONNECT ON DATABASE %I TO tusk_migrator', current_database());
+    EXECUTE format('GRANT CONNECT ON DATABASE %I TO tusk_app', current_database());
+    GRANT USAGE, CREATE ON SCHEMA public TO tusk_migrator;
+    GRANT USAGE ON SCHEMA public TO tusk_app;
+    ALTER DEFAULT PRIVILEGES FOR ROLE tusk_migrator IN SCHEMA public
+      GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO tusk_app;
+    ALTER DEFAULT PRIVILEGES FOR ROLE tusk_migrator IN SCHEMA public
+      GRANT USAGE, SELECT ON SEQUENCES TO tusk_app;
   END IF;
 
   IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'cron')
-     AND EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'nexus_migrator') THEN
-    GRANT USAGE ON SCHEMA cron TO nexus_migrator;
+     AND EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'tusk_migrator') THEN
+    GRANT USAGE ON SCHEMA cron TO tusk_migrator;
   END IF;
 END $$;
 `);

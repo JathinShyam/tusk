@@ -46,6 +46,16 @@ const errorHandlerPlugin: FastifyPluginAsync = async (app) => {
       meta: { requestId },
     });
   });
+
+  app.setNotFoundHandler((request, reply) => {
+    return reply.status(404).send({
+      error: {
+        code: "NOT_FOUND",
+        message: "Route not found",
+      },
+      meta: { requestId: request.requestId ?? "unknown" },
+    });
+  });
 };
 
 export default fp(errorHandlerPlugin, { name: "error-handler" });

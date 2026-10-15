@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    branches: [main, phase-0]
+    branches: [main, phase-0, phase-1]
   pull_request:
 
 jobs:
@@ -31,8 +31,8 @@ jobs:
       - name: Migrate
         run: pnpm migrate
         env:
-          DATABASE_MIGRATE_URL: postgres://nexus_migrator:nexus_migrator@localhost:5432/nexus
+          DATABASE_MIGRATE_URL: postgres://tusk_migrator:tusk_migrator@localhost:5432/tusk
       - name: Test
         run: pnpm test
         env:
-          DATABASE_URL: postgres://nexus_app:nexus_app@localhost:5432/nexus
+          DATABASE_URL: postgres://tusk_app:tusk_app@localhost:5432/tusk

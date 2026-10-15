@@ -10,7 +10,7 @@ import { loadConfig } from "../src/config.js";
  */
 const databaseUrl =
   process.env.DATABASE_URL ??
-  "postgres://nexus_app:nexus_app@localhost:5432/nexus";
+  "postgres://tusk_app:tusk_app@localhost:5432/tusk";
 
 describe("GET /v1/ready", () => {
   let app: FastifyInstance;
@@ -43,7 +43,7 @@ describe("GET /v1/ready", () => {
     const broken = await buildApp({
       config: loadConfig({
         ...process.env,
-        DATABASE_URL: "postgres://nexus_app:wrong@127.0.0.1:1/nexus",
+        DATABASE_URL: "postgres://tusk_app:wrong@127.0.0.1:1/tusk",
         LOG_LEVEL: "error",
       }),
     });

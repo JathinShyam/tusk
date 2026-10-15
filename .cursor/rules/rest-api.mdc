@@ -1,5 +1,5 @@
 ---
-description: REST /v1 envelope, status codes, and pagination for Nexus.
+description: REST /v1 envelope, status codes, and pagination for Tusk.
 globs: apps/api/src/{http,modules}/**/*.ts
 alwaysApply: false
 ---

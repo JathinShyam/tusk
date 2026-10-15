@@ -1,8 +1,9 @@
-FROM postgis/postgis:16-3.5
+FROM postgres:16-bookworm
 
-# postgis image already includes contrib (pg_trgm, pg_stat_statements, pgcrypto).
+# PGDG dropped bullseye (the postgis/postgis:16-3.5 base); bookworm has all packages.
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
+       postgresql-16-postgis-3 \
        postgresql-16-pgvector \
        postgresql-16-cron \
   && rm -rf /var/lib/apt/lists/*

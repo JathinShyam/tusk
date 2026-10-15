@@ -1,5 +1,5 @@
 ---
-description: SQL style, indexes, and migration rules for Nexus Postgres.
+description: SQL style, indexes, and migration rules for Tusk Postgres.
 globs: "**/*.{sql,sql.ts}"
 alwaysApply: false
 ---

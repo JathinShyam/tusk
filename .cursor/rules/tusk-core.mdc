@@ -1,9 +1,9 @@
 ---
-description: Nexus core constraints, stack, and phase discipline. Apply in every session.
+description: Tusk core constraints, stack, and phase discipline. Apply in every session.
 alwaysApply: true
 ---
 
-# Nexus core
+# Tusk core
 
 Read `AGENTS.md`, then the lowest open phase in `docs/ROADMAP.md`. Implement that phase only.
 

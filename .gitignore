@@ -45,6 +45,9 @@ Thumbs.db
 # Local editor history (not source)
 .history/
 
+# Local agent config (opencode)
+.opencode/
+
 # Docker / local data
 deploy/postgres/data/
 *.sql.gz

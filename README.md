@@ -1,10 +1,10 @@
-# Nexus
+# Tusk
 
 Production-grade, **Postgres-only** backend for a Local Experiences & Intelligence Hub: geospatial discovery, hybrid full-text + semantic search, AI recommendations, multi-tenant isolation, and real-time activity — all in one PostgreSQL instance.
 
 This repository is the system a senior SDE would own end-to-end: schema, API, performance, security, and operations. There is no Redis, Elasticsearch, Pinecone, MongoDB, or external scheduler.
 
-**Status:** Phase 0 complete on branch `phase-0`. Next: Phase 1 (identity + RLS). See [`docs/ROADMAP.md`](docs/ROADMAP.md).
+**Status:** Phase 1 complete on branch `phase-1` (identity, tenancy, JWT, forced RLS). Next: Phase 2 (places + geospatial). See [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ---
 
@@ -88,7 +88,7 @@ Traceability: feature PRDs use `FR-*` IDs; TRD uses `TR-*` IDs; roadmap checkbox
 
 ## Postgres capabilities this system must exercise
 
-| Capability | Feature | Nexus use |
+| Capability | Feature | Tusk use |
 |------------|---------|-----------|
 | Isolation | RLS + `FORCE ROW LEVEL SECURITY` | Tenant and role isolation |
 | Geo | PostGIS `geography` + GiST | Near-me, radius, bbox, distance rank |
@@ -152,7 +152,7 @@ cp .env.example .env
 corepack enable && corepack prepare pnpm@9.15.9 --activate
 pnpm install
 
-# Postgres with extensions + nexus_app / nexus_migrator roles
+# Postgres with extensions + tusk_app / tusk_migrator roles
 docker compose --env-file .env -f deploy/docker-compose.yml up -d --build --wait
 
 # Baseline migration (grants; extensions come from Compose init)
@@ -167,16 +167,47 @@ Verify extensions:
 
 ```bash
 docker compose -f deploy/docker-compose.yml exec postgres \
-  psql -U postgres -d nexus -c '\dx'
+  psql -U postgres -d tusk -c '\dx'
 ```
 
-Tests (health unit + ready via Testcontainers):
+Tests (health unit + integration against the Compose Postgres; migrations run automatically):
 
 ```bash
 pnpm typecheck && pnpm lint && pnpm test
 ```
 
-CI: `.github/workflows/ci.yml` runs typecheck, lint, and tests on `main` / `phase-0`.
+CI: `.github/workflows/ci.yml` runs typecheck, lint, and tests on `main` / `phase-0` / `phase-1`.
+
+---
+
+## Identity & tenancy (Phase 1)
+
+Endpoints: `POST /v1/auth/register|login|refresh|logout|switch-tenant`, `GET /v1/me`,
+`POST /v1/platform/tenants`, `GET|PATCH /v1/admin/tenant`, `POST /v1/admin/memberships` (invite by email).
+
+Isolation model: `tusk_app` connects with **no BYPASSRLS**; every request opens one transaction and sets
+`app.tenant_id` / `app.user_id` / `app.role` via `set_config(..., true)`. Policies on `tenants` and
+`memberships` cast through `nullif(current_setting(..., true), '')` (a reverted `SET LOCAL` reads back as `''`,
+not `NULL`). With no settings, queries return zero rows — verified by `test/rls.test.ts`, including a
+pooled-connection residue test.
+
+Self-serve tenant creation on register is gated by `ALLOW_SELF_TENANT=true` (dev only); production registers
+tenant-less users who join via platform tenant creation or an admin invite.
+
+### Creating the first platform admin
+
+The platform admin flag lives on the (global, non-RLS) `users` table and is never settable through the API.
+Bootstrap the first one with SQL:
+
+```bash
+docker compose --env-file .env -f deploy/docker-compose.yml exec postgres \
+  psql -U postgres -d tusk -c \
+  "UPDATE users SET is_platform_admin = true WHERE email = 'you@example.com';"
+```
+
+Register that email first (`POST /v1/auth/register` without a `tenant`), then log in: a platform admin gets a
+tenant-less token until they `switch-tenant`. Platform admins can `POST /v1/platform/tenants` (creating a tenant
+auto-adds the creator as its `tenant_admin`) and act inside any tenant.
 
 ---
 

@@ -27,7 +27,7 @@ CREATE POLICY places_tenant_isolation ON places
   USING (tenant_id = current_setting('app.tenant_id', true)::uuid)
   WITH CHECK (tenant_id = current_setting('app.tenant_id', true)::uuid);
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON places TO nexus_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON places TO tusk_app;
 ```
 
 Tighten `USING` with status/role in the same migration or a follow-up in Phase 2 (see identity PRD). Always keep tenant predicate.

@@ -1,5 +1,5 @@
 {
-  "name": "nexus",
+  "name": "tusk",
   "private": true,
   "packageManager": "pnpm@9.15.9",
   "engines": {

@@ -1,9 +1,9 @@
 ---
-name: nexus-phase
-description: Executes Nexus work in roadmap order with checklists and exit criteria. Use when implementing features, starting a session, asking what to do next, or updating docs/ROADMAP.md.
+name: tusk-phase
+description: Executes Tusk work in roadmap order with checklists and exit criteria. Use when implementing features, starting a session, asking what to do next, or updating docs/ROADMAP.md.
 ---
 
-# Nexus phase execution
+# Tusk phase execution
 
 ## Instructions
 

@@ -4,7 +4,7 @@ const path = require("node:path");
 module.exports = {
   databaseUrl:
     process.env.DATABASE_MIGRATE_URL ??
-    "postgres://nexus_migrator:nexus_migrator@localhost:5432/nexus",
+    "postgres://tusk_migrator:tusk_migrator@localhost:5432/tusk",
   dir: path.join(__dirname, "migrations"),
   direction: "up",
   migrationsTable: "pgmigrations",
