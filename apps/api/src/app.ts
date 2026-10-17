@@ -15,6 +15,8 @@ import tenantsRoutes from "./modules/identity/tenants.routes.js";
 import placesRoutes from "./modules/places/places.routes.js";
 import experiencesRoutes from "./modules/experiences/experiences.routes.js";
 import bookingsRoutes from "./modules/experiences/bookings.routes.js";
+import searchRoutes from "./modules/search/search.routes.js";
+import { createEmbeddingProvider } from "./modules/search/embeddings.js";
 
 export type AppDeps = {
   config: AppConfig;
@@ -23,6 +25,7 @@ export type AppDeps = {
 
 export async function buildApp(deps: AppDeps) {
   const db = deps.db ?? createDb(deps.config);
+  const embedder = createEmbeddingProvider(deps.config);
 
   const app = Fastify({
     logger: {
@@ -48,9 +51,10 @@ export async function buildApp(deps: AppDeps) {
     db,
     config: deps.config,
   });
-  await app.register(placesRoutes, { prefix: "/v1", db });
-  await app.register(experiencesRoutes, { prefix: "/v1", db });
+  await app.register(placesRoutes, { prefix: "/v1", db, embedder });
+  await app.register(experiencesRoutes, { prefix: "/v1", db, embedder });
   await app.register(bookingsRoutes, { prefix: "/v1", db });
+  await app.register(searchRoutes, { prefix: "/v1", db, embedder });
 
   app.addHook("onClose", async () => {
     await db.end({ timeout: 5 });

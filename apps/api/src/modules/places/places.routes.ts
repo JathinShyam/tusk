@@ -7,6 +7,7 @@ import { decodeCursor, type Cursor } from "../../lib/cursor.js";
 import { Meta, PaginatedMeta } from "../../lib/envelope.js";
 import { AppError } from "../../lib/errors.js";
 import { findMembership } from "../identity/identity.service.js";
+import { embedRow, type EmbeddingProvider } from "../search/embeddings.js";
 import { PlaceDto } from "./dto.js";
 import {
   createPlace,
@@ -16,7 +17,7 @@ import {
   toPlaceDto,
 } from "./places.service.js";
 
-type PlacesRoutesOpts = { db: Db };
+type PlacesRoutesOpts = { db: Db; embedder: EmbeddingProvider };
 
 const CreatePlaceBody = Type.Object({
   title: Type.String({ minLength: 1, maxLength: 200, pattern: "\\S" }),
@@ -124,7 +125,7 @@ export const placesRoutes: FastifyPluginAsyncTypebox<PlacesRoutesOpts> = async (
   app,
   opts,
 ) => {
-  const { db } = opts;
+  const { db, embedder } = opts;
 
   app.post(
     "/places",
@@ -209,6 +210,24 @@ export const placesRoutes: FastifyPluginAsyncTypebox<PlacesRoutesOpts> = async (
           });
         },
       );
+
+      // FR-SRCH-002 / TR §18: text is committed by now; a provider failure just
+      // leaves embedding_stale = true for the Phase 6 backfill job.
+      try {
+        await embedRow(
+          db,
+          { tenantId, userId: auth.userId, role: auth.role },
+          "places",
+          place.id,
+          `${place.title} ${place.description ?? ""}`,
+          embedder,
+        );
+      } catch (err) {
+        request.log.warn(
+          { err, placeId: place.id },
+          "place embedding failed; row left stale",
+        );
+      }
 
       return reply.status(201).send({
         data: { place: toPlaceDto(place) },

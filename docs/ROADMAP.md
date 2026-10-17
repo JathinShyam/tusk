@@ -219,30 +219,30 @@ Payments capture, search ranking.
 ### Checklist
 
 **Schema**
-- [ ] `[T]` Generated `fts` on `places` and `experiences` (+ GIN)
-- [ ] `[T]` `embedding vector(N)` + `embedding_stale boolean` on places, experiences
-- [ ] `[T]` HNSW cosine indexes
-- [ ] `[T]` `popularity` column or view (bookings count / reviews — simple counter ok)
-- [ ] `[T]` Ranking weights in `tenants.settings`
+- [x] `[T]` Generated `fts` on `places` and `experiences` (+ GIN)
+- [x] `[T]` `embedding vector(N)` + `embedding_stale boolean` on places, experiences
+- [x] `[T]` HNSW cosine indexes
+- [x] `[T]` `popularity` column or view (bookings count / reviews — simple counter ok) — computed live in `search_hybrid` (no stored counter; see phase4-search.md)
+- [x] `[T]` Ranking weights in `tenants.settings` — read from `settings->'ranking'`
 
 **App**
-- [ ] `[T]` Embedding provider interface: `openai` | `voyage` | `mock`
-- [ ] `[T]` On publish/update of searchable text: write row, then embed (same request **or** immediate async-in-process; do not drop the request if mock)
-- [ ] `[T]` If provider fails: set `embedding_stale`, still commit text (TR §18)
+- [x] `[T]` Embedding provider interface: `openai` | `voyage` | `mock`
+- [x] `[T]` On publish/update of searchable text: write row, then embed (same request **or** immediate async-in-process; do not drop the request if mock)
+- [x] `[T]` If provider fails: set `embedding_stale`, still commit text (TR §18)
 
 **API**
-- [ ] `[P]` `GET /v1/search` (`q`, geo, `limit`, cursor)
-- [ ] `[P]` Response includes `score`, `distanceM` (if geo), `kind: place|experience`
-- [ ] `[P]` `GET /v1/recommendations` naive: nearest neighbors to user pref embedding **or** popular-in-radius if no pref (FR-REC-001)
+- [x] `[P]` `GET /v1/search` (`q`, geo, `limit`, cursor)
+- [x] `[P]` Response includes `score`, `distanceM` (if geo), `kind: place|experience`
+- [x] `[P]` `GET /v1/recommendations` naive: nearest neighbors to user pref embedding **or** popular-in-radius if no pref (FR-REC-001) — no `user_preferences` table until Phase 5, so the fallback (FR-REC-003/004/005) is what ships now; FR-REC-002 lands with Phase 5
 
 **Tests**
-- [ ] `[T]` TR-TEST-006 mock embeddings
-- [ ] `[T]` Text-only vs hybrid: fixture where keyword and semantic disagree; hybrid order documented
-- [ ] `[T]` Search without `q` and without geo → 400
+- [x] `[T]` TR-TEST-006 mock embeddings
+- [x] `[T]` Text-only vs hybrid: fixture where keyword and semantic disagree; hybrid order documented
+- [x] `[T]` Search without `q` and without geo → 400
 
 **Docs**
-- [ ] `[D]` `docs/perf/phase4-search.md` EXPLAIN for hybrid SQL
-- [ ] `[D]` Ranking formula restated with actual SQL aliases
+- [x] `[D]` `docs/perf/phase4-search.md` EXPLAIN for hybrid SQL
+- [x] `[D]` Ranking formula restated with actual SQL aliases
 
 ### Exit criteria
 
