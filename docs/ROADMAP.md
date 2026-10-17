@@ -125,27 +125,34 @@ Places, bookings, search.
 ### Checklist
 
 **Schema**
-- [ ] `[T]` `places`: `geog geography(Point,4326)`, `status`, `title`, `description`, `attrs jsonb`
-- [ ] `[T]` GiST on `geog`
-- [ ] `[T]` GIN on `attrs` (used more in Phase 5; cheap to add now)
-- [ ] `[T]` RLS: published readable by tenant members; write = host/admin/owner as FR-GEO-*
-- [ ] `[T]` Optional `tenant_boundaries geography(MultiPolygon,4326)` on tenants or `zones` table — **minimum:** one polygon per tenant optional; skip UI; if present, inserts must `ST_Covers` (FR-GEO-008)
+- [x] `[T]` `places`: `geog geography(Point,4326)`, `status`, `title`, `description`, `attrs jsonb`
+- [x] `[T]` GiST on `geog`
+- [x] `[T]` GIN on `attrs` (used more in Phase 5; cheap to add now)
+- [x] `[T]` RLS: published readable by tenant members; write = host/admin/owner as FR-GEO-*
+- [x] `[T]` Optional `tenant_boundaries geography(MultiPolygon,4326)` on tenants or `zones` table — **minimum:** one polygon per tenant optional; skip UI; if present, inserts must `ST_Covers` (FR-GEO-008)
 
 **API**
-- [ ] `[P]` `POST /v1/places` (lon/lat in body)
-- [ ] `[P]` `GET /v1/places/:id`
-- [ ] `[P]` `GET /v1/places?lat=&lng=&radiusM=&limit=`
-- [ ] `[P]` `GET /v1/places?bbox=`
-- [ ] `[P]` Distance in response (`distanceM`)
-- [ ] `[P]` Order by distance when geo params present
+- [x] `[P]` `POST /v1/places` (lon/lat in body)
+- [x] `[P]` `GET /v1/places/:id`
+- [x] `[P]` `GET /v1/places?lat=&lng=&radiusM=&limit=`
+- [x] `[P]` `GET /v1/places?bbox=`
+- [x] `[P]` Distance in response (`distanceM`)
+- [x] `[P]` Order by distance when geo params present
 
 **Tests**
-- [ ] `[T]` TR-TEST-003 with real places
-- [ ] `[T]` TR-TEST-004 radius
-- [ ] `[T]` Point outside bbox excluded
+- [x] `[T]` TR-TEST-003 with real places
+- [x] `[T]` TR-TEST-004 radius
+- [x] `[T]` Point outside bbox excluded
 
 **Docs**
-- [ ] `[D]` Example `EXPLAIN` for near-me pasted into `docs/perf/phase2-places.md` (create folder)
+- [x] `[D]` Example `EXPLAIN` for near-me pasted into `docs/perf/phase2-places.md` (create folder)
+
+> **Note (GiST + RLS):** Postgres 16.4+ only uses an index under RLS when the
+> operator's underlying function is `LEAKPROOF`; PostGIS operators are not, so
+> near-me queries go through `place_ids_within_radius` / `place_ids_within_bbox`
+> (SECURITY DEFINER, owned by the BYPASSRLS migrator role, tenant read from the
+> `app.tenant_id` GUC — never an argument). The API re-fetches ids through
+> normal RLS queries. See [perf/phase2-places.md](perf/phase2-places.md).
 
 ### Exit criteria
 

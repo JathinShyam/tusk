@@ -12,6 +12,7 @@ import healthRoutes from "./http/routes/health.js";
 import authRoutes from "./modules/identity/auth.routes.js";
 import meRoutes from "./modules/identity/me.routes.js";
 import tenantsRoutes from "./modules/identity/tenants.routes.js";
+import placesRoutes from "./modules/places/places.routes.js";
 
 export type AppDeps = {
   config: AppConfig;
@@ -45,6 +46,7 @@ export async function buildApp(deps: AppDeps) {
     db,
     config: deps.config,
   });
+  await app.register(placesRoutes, { prefix: "/v1", db });
 
   app.addHook("onClose", async () => {
     await db.end({ timeout: 5 });

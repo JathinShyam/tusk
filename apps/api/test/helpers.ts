@@ -36,3 +36,39 @@ export function uniqueEmail(prefix = "user"): string {
 export function randomSuffix(): string {
   return randomUUID().slice(0, 8);
 }
+
+export const TEST_PASSWORD = "correct-horse-battery-staple";
+
+export type TenantUserSeed = {
+  email: string;
+  userId: string;
+  tenantId: string;
+  accessToken: string;
+};
+
+/** Register a user with a fresh tenant (tenant_admin membership). */
+export async function registerTenantUser(
+  app: FastifyInstance,
+  prefix: string,
+): Promise<TenantUserSeed> {
+  const email = uniqueEmail(prefix);
+  const res = await app.inject({
+    method: "POST",
+    url: "/v1/auth/register",
+    payload: {
+      email,
+      password: TEST_PASSWORD,
+      tenant: { name: `Tenant ${prefix} ${randomSuffix()}` },
+    },
+  });
+  if (res.statusCode !== 201) {
+    throw new Error(`register failed (${res.statusCode}): ${res.body}`);
+  }
+  const data = res.json().data;
+  return {
+    email,
+    userId: data.user.id,
+    tenantId: data.tenant.id,
+    accessToken: data.accessToken,
+  };
+}

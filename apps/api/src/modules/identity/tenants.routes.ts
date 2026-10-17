@@ -35,12 +35,21 @@ const CreateTenantBody = Type.Object({
   ),
 });
 
+const BoundaryGeometry = Type.Object({
+  type: Type.Union([Type.Literal("Polygon"), Type.Literal("MultiPolygon")]),
+  coordinates: Type.Array(Type.Unknown()),
+});
+
 const PatchTenantBody = Type.Object(
   {
     name: Type.Optional(
       Type.String({ minLength: 1, maxLength: 120, pattern: "\\S" }),
     ),
     settings: Type.Optional(Type.Record(Type.String(), Type.Unknown())),
+    /** FR-GEO-008: tenant delivery area; null clears it. */
+    boundary: Type.Optional(
+      Type.Union([BoundaryGeometry, Type.Null()]),
+    ),
   },
   { minProperties: 1 },
 );
@@ -197,6 +206,14 @@ export const tenantsRoutes: FastifyPluginAsyncTypebox<TenantsRoutesOpts> = async
           const updated = await updateTenant(tx, tenantId, {
             name: body.name?.trim(),
             settings: body.settings,
+            ...(body.boundary !== undefined
+              ? {
+                  boundary:
+                    body.boundary === null
+                      ? null
+                      : JSON.stringify(body.boundary),
+                }
+              : {}),
           });
           if (!updated) {
             throw new AppError("NOT_FOUND", 404, "Tenant not found");

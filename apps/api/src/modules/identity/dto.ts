@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
 
-export const Meta = Type.Object({ requestId: Type.String() });
+export { Meta } from "../../lib/envelope.js";
 
 export const UserDto = Type.Object({
   id: Type.String(),
