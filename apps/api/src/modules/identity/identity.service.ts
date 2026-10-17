@@ -172,15 +172,46 @@ export async function updateTenant(
   patch: {
     name?: string | undefined;
     settings?: Record<string, unknown> | undefined;
+    /** GeoJSON Polygon/MultiPolygon text, null to clear, undefined to keep (FR-GEO-008). */
+    boundary?: string | null | undefined;
   },
 ): Promise<TenantRow | null> {
+  if (patch.boundary !== undefined && patch.boundary !== null) {
+    let probe: { valid: boolean; gtype: string }[];
+    try {
+      probe = await tx<{ valid: boolean; gtype: string }[]>`
+        SELECT ST_IsValid(g) AS valid, GeometryType(g) AS gtype
+        FROM (SELECT ST_Multi(ST_GeomFromGeoJSON(${patch.boundary}::text)) AS g) s
+      `;
+    } catch {
+      throw new AppError(
+        "VALIDATION",
+        400,
+        "boundary must be a GeoJSON Polygon or MultiPolygon",
+      );
+    }
+    const p = probe[0];
+    if (!p || p.gtype !== "MULTIPOLYGON" || p.valid !== true) {
+      throw new AppError(
+        "VALIDATION",
+        400,
+        "boundary must be a valid GeoJSON Polygon or MultiPolygon",
+      );
+    }
+  }
+
   const rows = await tx<TenantRow[]>`
     UPDATE tenants
     SET name = coalesce(${patch.name ?? null}, name),
         settings = coalesce(
           settings || ${patch.settings === undefined ? null : tx.json(patch.settings as JSONValue)}::jsonb,
           settings
-        )
+        ),
+        boundary = CASE
+          WHEN ${patch.boundary === null} THEN NULL
+          WHEN ${patch.boundary ?? null}::text IS NULL THEN boundary
+          ELSE ST_Multi(ST_GeomFromGeoJSON(${patch.boundary ?? null}::text))::geography(MultiPolygon, 4326)
+        END
     WHERE id = ${tenantId}
     RETURNING id, name, slug, type, status, settings, created_at, updated_at
   `;

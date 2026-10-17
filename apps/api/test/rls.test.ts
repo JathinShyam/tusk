@@ -3,55 +3,22 @@ import type { FastifyInstance } from "fastify";
 import postgres, { type TransactionSql } from "postgres";
 import {
   buildTestApp,
-  randomSuffix,
+  registerTenantUser,
   TEST_DATABASE_URL,
-  uniqueEmail,
+  type TenantUserSeed,
 } from "./helpers.js";
-
-const PASSWORD = "correct-horse-battery-staple";
-
-type Seed = {
-  email: string;
-  userId: string;
-  tenantId: string;
-  accessToken: string;
-};
-
-async function seedTenantUser(
-  app: FastifyInstance,
-  prefix: string,
-): Promise<Seed> {
-  const email = uniqueEmail(prefix);
-  const res = await app.inject({
-    method: "POST",
-    url: "/v1/auth/register",
-    payload: {
-      email,
-      password: PASSWORD,
-      tenant: { name: `RLS ${prefix} ${randomSuffix()}` },
-    },
-  });
-  expect(res.statusCode).toBe(201);
-  const data = res.json().data;
-  return {
-    email,
-    userId: data.user.id,
-    tenantId: data.tenant.id,
-    accessToken: data.accessToken,
-  };
-}
 
 describe("RLS isolation (TR-SEC-003, FR-ID-011/012)", () => {
   let app: FastifyInstance;
   const appSql = postgres(TEST_DATABASE_URL, { max: 4 });
 
-  let tenantA: Seed;
-  let tenantB: Seed;
+  let tenantA: TenantUserSeed;
+  let tenantB: TenantUserSeed;
 
   beforeAll(async () => {
     app = await buildTestApp();
-    tenantA = await seedTenantUser(app, "alice");
-    tenantB = await seedTenantUser(app, "bob");
+    tenantA = await registerTenantUser(app, "alice");
+    tenantB = await registerTenantUser(app, "bob");
   });
 
   afterAll(async () => {
