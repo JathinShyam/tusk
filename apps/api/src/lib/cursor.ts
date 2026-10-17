@@ -1,12 +1,13 @@
 import { AppError } from "./errors.js";
 
 /**
- * Opaque keyset cursor (TRD §10.4): base64url of `{ d?, t?, id }`.
+ * Opaque keyset cursor (TRD §10.4): base64url of `{ d?, t?, s?, id }`.
  * - `d` is `distanceM` for distance-ordered lists (near-me),
  * - `t` is `created_at` ISO for recency-ordered lists,
+ * - `s` is the float `score` for relevance-ordered lists (search),
  * - lists with a different ordering must reject a foreign cursor shape.
  */
-export type Cursor = { d?: number; t?: string; id: string };
+export type Cursor = { d?: number; t?: string; s?: number; id: string };
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -29,6 +30,7 @@ export function decodeCursor(raw: string): Cursor {
     typeof c.id !== "string" ||
     !UUID_RE.test(c.id) ||
     (c.d !== undefined && !Number.isFinite(c.d)) ||
+    (c.s !== undefined && !Number.isFinite(c.s)) ||
     (c.t !== undefined &&
       (typeof c.t !== "string" || Number.isNaN(Date.parse(c.t))))
   ) {

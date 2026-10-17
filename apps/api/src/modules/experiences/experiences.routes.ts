@@ -7,6 +7,7 @@ import { decodeCursor } from "../../lib/cursor.js";
 import { Meta, PaginatedMeta } from "../../lib/envelope.js";
 import { AppError } from "../../lib/errors.js";
 import { findMembership } from "../identity/identity.service.js";
+import { embedRow, type EmbeddingProvider } from "../search/embeddings.js";
 import { BookingDto, ExperienceDto, SlotDto } from "./dto.js";
 import {
   createExperience,
@@ -23,7 +24,7 @@ import {
 } from "./bookings.service.js";
 import { createHash } from "node:crypto";
 
-type ExperienceRoutesOpts = { db: Db };
+type ExperienceRoutesOpts = { db: Db; embedder: EmbeddingProvider };
 
 const CreateExperienceBody = Type.Object({
   placeId: Type.String({ format: "uuid" }),
@@ -70,7 +71,7 @@ function parseLimit(raw: number | undefined): number {
 
 export const experiencesRoutes: FastifyPluginAsyncTypebox<ExperienceRoutesOpts> =
   async (app, opts) => {
-    const { db } = opts;
+    const { db, embedder } = opts;
 
     app.post(
       "/experiences",
@@ -149,6 +150,23 @@ export const experiencesRoutes: FastifyPluginAsyncTypebox<ExperienceRoutesOpts> 
             });
           },
         );
+
+        // FR-SRCH-002 / TR §18: same on-write embed contract as places.
+        try {
+          await embedRow(
+            db,
+            { tenantId, userId: auth.userId, role: auth.role },
+            "experiences",
+            experience.id,
+            `${experience.title} ${experience.description ?? ""}`,
+            embedder,
+          );
+        } catch (err) {
+          request.log.warn(
+            { err, experienceId: experience.id },
+            "experience embedding failed; row left stale",
+          );
+        }
 
         return reply.status(201).send({
           data: { experience: toExperienceDto(experience) },
