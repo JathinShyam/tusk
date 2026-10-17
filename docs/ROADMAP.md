@@ -175,28 +175,28 @@ FTS, vectors, bookings.
 ### Checklist
 
 **Schema**
-- [ ] `[T]` `experiences`, `experience_slots`, `bookings`, `idempotency_keys`
-- [ ] `[T]` FKs with tenant consistency (same `tenant_id` on child rows; triggers or composite FKs)
-- [ ] `[T]` Slot row lock + capacity count (TR §9)
-- [ ] `[T]` Booking statuses: `pending | confirmed | cancelled`
-- [ ] `[T]` Unique `(slot_id, user_id)` where status active (partial unique index)
-- [ ] `[T]` `categories` + `parent_id` (hierarchy used in Phase 4 filters; can be thin)
+- [x] `[T]` `experiences`, `experience_slots`, `bookings`, `idempotency_keys`
+- [x] `[T]` FKs with tenant consistency (same `tenant_id` on child rows; composite FKs)
+- [x] `[T]` Slot lock + capacity count (TR §9) — advisory lock, see [perf/phase3-bookings.md](perf/phase3-bookings.md)
+- [x] `[T]` Booking statuses: `pending | confirmed | cancelled`
+- [x] `[T]` Unique `(slot_id, user_id)` where status active (partial unique index)
+- [x] `[T]` `categories` + `parent_id` (hierarchy used in Phase 4 filters; can be thin)
 
 **API**
-- [ ] `[P]` Experience CRUD (create/list/get; patch as FR)
-- [ ] `[P]` Slot create/list
-- [ ] `[P]` `POST .../bookings` with `Idempotency-Key`
-- [ ] `[P]` List my bookings; get by id; cancel
-- [ ] `[P]` `409 BOOKING_CAPACITY` / `BOOKING_CONFLICT`
+- [x] `[P]` Experience CRUD (create/list/get; patch as FR — no FR requires patch, none added)
+- [x] `[P]` Slot create/list
+- [x] `[P]` `POST .../bookings` with `Idempotency-Key`
+- [x] `[P]` List my bookings; get by id; cancel
+- [x] `[P]` `409 BOOKING_CAPACITY` / `BOOKING_CONFLICT`
 
 **Tests**
-- [ ] `[T]` TR-TEST-005 concurrent capacity=1
-- [ ] `[T]` Idempotent replay returns same booking id
-- [ ] `[T]` Cancel frees capacity
-- [ ] `[T]` Host cannot book-over by skipping API (direct SQL as app role still RLS-bound)
+- [x] `[T]` TR-TEST-005 concurrent capacity=1
+- [x] `[T]` Idempotent replay returns same booking id
+- [x] `[T]` Cancel frees capacity
+- [x] `[T]` Host cannot book-over by skipping API (direct SQL as app role still RLS-bound)
 
 **Docs**
-- [ ] `[D]` Comment + `docs/perf/phase3-bookings.md`: lock strategy chosen
+- [x] `[D]` Comment + `docs/perf/phase3-bookings.md`: lock strategy chosen
 
 ### Exit criteria
 

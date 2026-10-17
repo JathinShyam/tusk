@@ -4,6 +4,9 @@ GRANT CONNECT ON DATABASE tusk TO tusk_app;
 GRANT USAGE, CREATE ON SCHEMA public TO tusk_migrator;
 GRANT USAGE ON SCHEMA public TO tusk_app;
 
+-- Migrations may create trusted extensions (e.g. btree_gist in Phase 3).
+GRANT CREATE ON DATABASE tusk TO tusk_migrator;
+
 ALTER DEFAULT PRIVILEGES FOR ROLE tusk_migrator IN SCHEMA public
   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO tusk_app;
 ALTER DEFAULT PRIVILEGES FOR ROLE tusk_migrator IN SCHEMA public
